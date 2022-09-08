@@ -7,8 +7,19 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 const App: React.FC = () => {
   const [todo, setTodo] = useState<string>("")
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [completedTodos, setCompletedTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const todosValue = window.localStorage.getItem('todos');
+    return todosValue !== null
+      ? JSON.parse(todosValue)
+      : [];
+  });
+
+  const [completedTodos, setCompletedTodos] = useState<Todo[]>(() => {
+    const completedTodosValue = window.localStorage.getItem('completedTodos');
+    return completedTodosValue !== null
+      ? JSON.parse(completedTodosValue)
+      : [];
+  });
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,6 +28,9 @@ const App: React.FC = () => {
       setTodo("")
     }
   }
+  
+  window.localStorage.setItem('completedTodos', JSON.stringify(completedTodos))
+  window.localStorage.setItem('todos', JSON.stringify(todos))
   
   const onDragEnd = (result: DropResult) => {
     const { destination, source } = result;
@@ -55,6 +69,8 @@ const App: React.FC = () => {
 
     setCompletedTodos(complete);
     setTodos(active);
+    window.localStorage.setItem('todos', JSON.stringify(todos))
+    window.localStorage.setItem('completedTodos', JSON.stringify(completedTodos))
   };
 
   return (
